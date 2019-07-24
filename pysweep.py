@@ -10,7 +10,8 @@ cidr_tab = {24: 255}
 def create_ip_list(ip_target, cidr):
     '''create a list of IP addresses'''
     last_octet = range(cidr_tab[cidr])
-    ip_target_list = [ip_target + str(x) for x in last_octet)]
+    ip_target_list = [ip_target + str(x) for x in last_octet]
+    return ip_target_list
     
 
 # loop over the list of IP addresses
