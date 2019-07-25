@@ -7,11 +7,13 @@ Usage:
 
 This currently works for cidr 24 only.
 
-Specify sample_range. The default range is 100 to 110. If you want to scan
+Specify sample_range. The default range is 100 to 200. If you want to scan
 all IP addresses in the network, specify "all".
 
 Sample:
-        ./pysweep.py 192.168.0.23 /24 100-200
+        ./pysweep.py 192.168.0.23 /24
+        ./pysweep.py 192.168.0.23 /24 5-20
+        ./pysweep.py 192.168.0.23 /24 all
 '''
 import subprocess
 import sys
@@ -35,7 +37,7 @@ def create_ip_list(ip, cidr, sample):
 
 
 def process_list(begin_time, end_time):
-    '''Process List: loop over the list of IP addresses'''
+    '''Process List: loop over the list of detected IP addresses'''
     global detected_ip_list
     if detected_ip_list == []:
         print("\nSaw nothing on the network.\n")
@@ -81,7 +83,7 @@ def get_cidr_range(cidr, sample):
             return False
     
 
-def main(ip, cidr, sample='100-110'):
+def main(ip, cidr, sample='100-108'):
     begin_time = datetime.now()
     ip_target_list = create_ip_list(ip, cidr, sample)
     if ip_target_list:
@@ -94,5 +96,11 @@ def main(ip, cidr, sample='100-110'):
 
 
 if __name__ == "__main__":
-    main("192.168.0.108", "/24", "100-108")
-#    main(sys.argv[1], sys.argv[2])
+#    main("192.168.0.108", "/24", "100-108") for testing
+    argv_len = len(sys.argv)
+    if argv_len == 4:
+        main(sys.argv[1], sys.argv[2], sys.argv[3])
+    elif argv_len == 3:
+        main(sys.argv[1], sys.argv[2], "100-108")
+    else:
+        sys.exit('too many or not enough arguments')
