@@ -15,9 +15,10 @@ Sample:
 '''
 import subprocess
 import sys
+from datetime import datetime
 
 # global variables
-raw_ip_capture_list = []
+detected_ip_list = []
 cidr_table = {24: 255}
 
 
@@ -33,32 +34,30 @@ def create_ip_list(ip, cidr, sample):
         return False
 
 
-def process_list():
+def process_list(begin_time, end_time):
     '''Process List: loop over the list of IP addresses'''
-    global raw_ip_capture_list
-    ip_on_network_list = []
-    for result in raw_ip_capture_list:
-        if result.returncode == 0:
-            print(result.args[5])
-            ip_on_network_list.append(result.stdout)
-    if ip_on_network_list:
-        prepare_output(ip_on_network_list)
-    else:
+    global detected_ip_list
+    if detected_ip_list == []:
         print("\nSaw nothing on the network.\n")
-
-
-def prepare_output(lst):
-    '''Print IPs on network'''
-    
-    pass
+    else:
+        print("\nDetected Hosts:")
+        print("===============\n")
+        for ip in detected_ip_list:
+            print(f"{ip}")
+        scan_duration = end_time - begin_time
+        print(f"\nTotal time to scan took: {scan_duration}")
 
 
 def fping_ip(ip):
     # TODO: error handling
-    print(f"fping is trying: {ip}")
-    global raw_ip_capture_list
+    global detected_ip_list
     output = subprocess.run(["fping", "-a", "-C", "5", "-q", ip], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    raw_ip_capture_list.append(output)
+    if output.returncode == 0:
+        output_b = output.stdout
+        output_str = output_b.decode("utf-8")
+        ip, response = output_str.split(':')
+        print(f"Host {ip.strip()} is detected online. Response time(s) were: {response.strip()}")
+        detected_ip_list.append(ip.strip())
 
 
 def get_three_octets(ip):
@@ -83,15 +82,17 @@ def get_cidr_range(cidr, sample):
     
 
 def main(ip, cidr, sample='100-110'):
+    begin_time = datetime.now()
     ip_target_list = create_ip_list(ip, cidr, sample)
     if ip_target_list:
         for ip in ip_target_list:
             fping_ip(ip)
-        process_list()
+        end_time = datetime.now()
+        process_list(begin_time, end_time)
     else:
         print("\nSorry, I can only handle so much for now.\n")
 
 
 if __name__ == "__main__":
-    main("192.168.0.108", "/24", "101-108")
+    main("192.168.0.108", "/24", "100-108")
 #    main(sys.argv[1], sys.argv[2])
