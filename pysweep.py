@@ -37,17 +37,22 @@ def create_ip_list(ip, cidr, sample):
 
 
 def process_list(begin_time, end_time):
-    '''Process List: loop over the list of detected IP addresses'''
+    '''Process List: loop over the list of detected IP addresses,
+    outputs to stdout and write to file'''
     global detected_ip_list
     if detected_ip_list == []:
         print("\nSaw nothing on the network.\n")
     else:
-        print("\nDetected Hosts:")
-        print("===============\n")
+        summary = ''
+        summary += "Detected Hosts:\n===============\n"
         for ip in detected_ip_list:
-            print(f"{ip}")
+            summary += f"{ip}\n"
         scan_duration = end_time - begin_time
-        print(f"\nTotal time to scan took: {scan_duration}")
+        summary += f"\nTotal time to scan took: {scan_duration}"
+        print(summary)
+        
+        with open('pingsweep-results.txt', 'w') as f:
+            f.write(summary)
 
 
 def fping_ip(ip):
