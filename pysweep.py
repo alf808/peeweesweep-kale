@@ -56,15 +56,19 @@ def process_list(begin_time, end_time):
 
 
 def fping_ip(ip):
-    # TODO: error handling
+    '''This will attempt to fping each IP in the network. Only handling SubprocessError'''
     global detected_ip_list
-    output = subprocess.run(["fping", "-a", "-C", "5", "-q", ip], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    if output.returncode == 0:
-        output_b = output.stdout
-        output_str = output_b.decode("utf-8")
-        ip, response = output_str.split(':')
-        print(f"Host {ip.strip()} is detected online. Response time(s) were: {response.strip()}")
-        detected_ip_list.append(ip.strip())
+    try:
+        output = subprocess.run(["fping", "-a", "-C", "5", "-q", ip], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    except subprocess.SubprocessError:
+        print("There was an error in the command invocation.")
+    else:
+        if output.returncode == 0:
+            output_b = output.stdout
+            output_str = output_b.decode("utf-8")
+            ip, response = output_str.split(':')
+            print(f"Host {ip.strip()} is detected online. Response time(s) were: {response.strip()}")
+            detected_ip_list.append(ip.strip())
 
 
 def get_three_octets(ip):
