@@ -29,10 +29,8 @@ def create_ip_list(ip, cidr, sample):
     '''create a list of IP addresses'''
     ipcidr = ip + cidr
     net_ips = ipaddress.ip_network(ipcidr, strict=False)
-    net_ips_temp = net_ips.hosts()
-    ip_list = [xip for xip in net_ips_temp]
+    ip_list = [str(xip) for xip in net_ips.hosts()]
     return ip_list
-
 
 
 def process_list(begin_time, end_time):
@@ -70,42 +68,42 @@ def fping_ip(ip):
             detected_ip_list.append(ip.strip())
 
 
-def get_three_octets(ip):
-    ip_temp = ip.split('.')
-    ip_temp.pop()
-    return '.'.join(ip_temp)
+# def get_three_octets(ip):
+#     ip_temp = ip.split('.')
+#     ip_temp.pop()
+#     return '.'.join(ip_temp)
 
 
-def get_cidr_range(cidr, sample):
-    # TODO: fix for cidr 27
-    if cidr != 24:
-        return False
-    elif cidr == 24 and sample == 'all':
-        return range(cidr_table[cidr])
-    else:
-        # TODO: check out of range start and end
-        start, end = sample.split('-')
-        if int(start) < 255 and int(end) < 255:
-            return range(int(start), int(end)+1)
-        else:
-            return False
+# def get_cidr_range(cidr, sample):
+#     # TODO: fix for cidr 27
+#     if cidr != 24:
+#         return False
+#     elif cidr == 24 and sample == 'all':
+#         return range(cidr_table[cidr])
+#     else:
+#         # TODO: check out of range start and end
+#         start, end = sample.split('-')
+#         if int(start) < 255 and int(end) < 255:
+#             return range(int(start), int(end)+1)
+#         else:
+#             return False
     
 
 def main(ip, cidr, sample='100-108'):
     begin_time = datetime.now()
     ip_target_list = create_ip_list(ip, cidr, sample)
-    print(ip_target_list)
-    # if ip_target_list:
-    #     for ip in ip_target_list:
-    #         fping_ip(ip)
-    #     end_time = datetime.now()
-    #     process_list(begin_time, end_time)
-    # else:
-    #     print("\nSorry, I can only handle so much for now.\n")
+    # print(ip_target_list)
+    if ip_target_list:
+        for ip in ip_target_list:
+            fping_ip(ip)
+        end_time = datetime.now()
+        process_list(begin_time, end_time)
+    else:
+        print("\nSorry, I can only handle so much for now.\n")
 
 
 if __name__ == "__main__":
-    main("192.168.0.108", "/24", "100-108") # for testing
+    main("192.168.0.108", "/27", "100-108") # for testing
     # argv_len = len(sys.argv)
     # if argv_len == 4:
     #     main(sys.argv[1], sys.argv[2], sys.argv[3])
