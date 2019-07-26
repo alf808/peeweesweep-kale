@@ -18,6 +18,7 @@ Sample:
 import subprocess
 import sys
 from datetime import datetime
+import ipaddress
 
 # global variables
 detected_ip_list = []
@@ -26,14 +27,12 @@ cidr_table = {24: 255}
 
 def create_ip_list(ip, cidr, sample):
     '''create a list of IP addresses'''
-    cidr_int = int(cidr.strip('/'))
-    last_octet_list = get_cidr_range(cidr_int, sample)
-    if last_octet_list:
-        ip_target = get_three_octets(ip)
-        ip_target_list = [ip_target + '.' + str(x) for x in last_octet_list]
-        return ip_target_list
-    else:
-        return False
+    ipcidr = ip + cidr
+    net_ips = ipaddress.ip_network(ipcidr, strict=False)
+    net_ips_temp = net_ips.hosts()
+    ip_list = [xip for xip in net_ips_temp]
+    return ip_list
+
 
 
 def process_list(begin_time, end_time):
@@ -95,21 +94,22 @@ def get_cidr_range(cidr, sample):
 def main(ip, cidr, sample='100-108'):
     begin_time = datetime.now()
     ip_target_list = create_ip_list(ip, cidr, sample)
-    if ip_target_list:
-        for ip in ip_target_list:
-            fping_ip(ip)
-        end_time = datetime.now()
-        process_list(begin_time, end_time)
-    else:
-        print("\nSorry, I can only handle so much for now.\n")
+    print(ip_target_list)
+    # if ip_target_list:
+    #     for ip in ip_target_list:
+    #         fping_ip(ip)
+    #     end_time = datetime.now()
+    #     process_list(begin_time, end_time)
+    # else:
+    #     print("\nSorry, I can only handle so much for now.\n")
 
 
 if __name__ == "__main__":
-#    main("192.168.0.108", "/24", "100-108") for testing
-    argv_len = len(sys.argv)
-    if argv_len == 4:
-        main(sys.argv[1], sys.argv[2], sys.argv[3])
-    elif argv_len == 3:
-        main(sys.argv[1], sys.argv[2], "100-108")
-    else:
-        sys.exit('too many or not enough arguments')
+    main("192.168.0.108", "/24", "100-108") # for testing
+    # argv_len = len(sys.argv)
+    # if argv_len == 4:
+    #     main(sys.argv[1], sys.argv[2], sys.argv[3])
+    # elif argv_len == 3:
+    #     main(sys.argv[1], sys.argv[2], "100-108")
+    # else:
+    #     sys.exit('too many or not enough arguments')
