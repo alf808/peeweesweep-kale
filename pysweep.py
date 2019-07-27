@@ -88,4 +88,4 @@ if __name__ == "__main__":
     elif argv_len == 2:
         main(sys.argv[1], "/27")
     else:
-        sys.exit('too many or not enough arguments')
+        sys.exit('\ntoo many or not enough arguments.\nUSAGE: ./pysweep.py <ip> <cidr>\n')
