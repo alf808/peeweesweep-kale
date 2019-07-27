@@ -19,14 +19,21 @@ import ipaddress
 
 # global variables
 detected_ip_list = []
+sys.tracebacklimit = 0 # comment this to see tracebacks
 
 
 def create_ip_list(ip, cidr="/27"):
     '''create a list of IP addresses'''
     ipcidr = ip + cidr
-    net_ips = ipaddress.ip_network(ipcidr, strict=False)
-    ip_list = [str(xip) for xip in net_ips.hosts()]
-    return ip_list
+    try:
+        net_ips = ipaddress.ip_network(ipcidr, strict=False)
+    except ValueError:
+        print('\nPlease make sure that you entered valid IP or CIDR\n')
+    except TypeError:
+        print('\nPlease make sure that you entered valid IP or CIDR\n')
+    else:
+        ip_list = [str(xip) for xip in net_ips.hosts()]
+        return ip_list
 
 
 def process_list(begin_time, end_time):
@@ -67,21 +74,18 @@ def fping_ip(ip):
 def main(ip, cidr):
     begin_time = datetime.now()
     ip_target_list = create_ip_list(ip, cidr)
-    if ip_target_list:
-        for ip in ip_target_list:
-            fping_ip(ip)
-        end_time = datetime.now()
-        process_list(begin_time, end_time)
-    else:
-        print("\nSorry, I can only handle so much for now.\n")
+    for ip in ip_target_list:
+        fping_ip(ip)
+    end_time = datetime.now()
+    process_list(begin_time, end_time)
 
 
 if __name__ == "__main__":
-    # main("192.168.0.108", "/27") # for testing
+    # main("192.168.0.257", "/27") # for testing
     argv_len = len(sys.argv)
     if argv_len == 3:
         main(sys.argv[1], sys.argv[2])
-    if argv_len == 2:
+    elif argv_len == 2:
         main(sys.argv[1], "/27")
     else:
         sys.exit('too many or not enough arguments')
