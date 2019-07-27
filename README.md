@@ -5,15 +5,12 @@ This is a ping sweep utility to automate and capture some of the results of
 a ping sweep across the network.
 
 ## Usage:
-```
-        ./pysweep.py <ip> <cidr> <sample_range>
-```
-**This currently works for cidr 24 only.**
+(if no cidr is specified, default is '/27')
 
-Specify sample_range. **The default range is 100 to 200.** If you want to scan
-all IP addresses in the network, specify "all".
+        ./pysweep.py <ip> <cidr>
 
-## Sample Usage:
+
+## Sample Usage: 
+        ./pysweep.py 192.168.0.23
         ./pysweep.py 192.168.0.23 /24
-        ./pysweep.py 192.168.0.23 /24 5-20
-        ./pysweep.py 192.168.0.23 /24 all
+        ./pysweep.py 192.168.0.23 /29
